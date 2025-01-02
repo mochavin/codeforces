@@ -12,25 +12,21 @@ ll N = 2e5 + 5;
 void solve()
 {
   ll l, r, g; cin >> l >> r >> g;
-  // find the smallest x st. g|x
-  ll x = (l + g - 1) / g * g;
-  ll a = x;
-  if (x < l) {
-    a += g;
+  ll l2 = (l + (g - 1)) / g, r2 = r / g; // 2, 4
+  ll x = l2 * g, y = r2 * g; // 4, 8
+  // i: selisih
+  for (ll i = r2 - l2; i >= 0; i--) {
+
+    // j: all the pair for sliding window with length i
+    for (ll j = l2; j + i <= r2; j++) {
+      if (__gcd(j, j + i) == 1) {
+        cout << j * g << " " << (j + i) * g << endl;
+        return;
+      }
+    }
   }
 
-  if (a > r) {
-    cout << "-1 -1" << endl;
-    return;
-  }
-  // find greatest y st. g|y and y less than r
-  ll y = r / g * g;
-  while (__gcd(a, y) != g && y - g >= l) {
-    y -= g;
-  }
-  if (__gcd(a, y) != g) cout << "-1 -1";
-  else cout << a << " " << y;
-  cout << endl;
+  cout << -1 << " " << -1 << endl;
 }
 
 int main()
