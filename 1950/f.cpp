@@ -16,29 +16,20 @@ void solve()
     cout << -1 << endl;
     return;
   }
-  if (a == 0) {
-    cout << b << endl;
-    return;
-  }
-  // msb of a
-  int msb = 0;
-  for (int i = 30; i >= 0; i--) {
-    if (1 << i & a)  msb = i + 1;
+  if (a + b + c == 1) {
+    cout << 0 << endl; return;
   }
 
-  cout << msb << endl;
-  // sisa yang heightnya yg lebih kecil
-  ll sisa = 1 << (msb);
-  sisa -= a;
-
-  ll rilsisa = sisa - min(b, sisa);
-  // b -= min(b, sisa);
-  if (b <= sisa) {
-    cout << msb << endl;
+  ll curr = 1, child = 0, ans = 1;
+  loop(i, a + b) {
+    if (curr == 0) {
+      swap(child, curr);
+      ans++;
+    }
+    curr--;
+    child += (i < a ? 2 : 1);
   }
-  else {
-    cout << msb + b / (a + 1) << endl;
-  }
+  cout << ans << endl;
 
 }
 
