@@ -15,35 +15,87 @@ void solve()
   int n; cin >> n;
   string s; cin >> s;
   if (n % 2) {
-    // hapus salah satu char
-    vector<int> v(26, 0), v2(26, 0);
-    loop(i, s.length()) {
-      if (i % 2) v2[s[i] - 'a']++;
-      else v[s[i] - 'a']++;
+    if (n == 1) {
+      cout << 1 << endl; return;
     }
-    vector<int> a(26, 0), a2(26, 0);
-    vector<vector<int>> b(n, vector<int>(26, 0)), b2(n, vector<int>(26, 0));
-    loop(i, s.length()) {
-      loop(j, 26) {
-        if (i == 0) {
-          b[i][j] = v2[j];
-          b2[i][j] = v[j];
-        }
-        else {
-          b[i][j] = v2[j] - a[j];
-          b2[i][j] = v[j] - a2[j];
-        }
-      }
-      int charini = s[i] - 'a';
-      if (i % 2) a2[charini]++;
-      else a[charini]++;
-    }
+    vector<vector<int>> pre1(n, vector<int>(26, 0));
+    vector<vector<int>> pre2(n, vector<int>(26, 0));
+    vector<vector<int>> suf1(n, vector<int>(26, 0));
+    vector<vector<int>> suf2(n, vector<int>(26, 0));
 
     loop(i, n) {
-
+      char iki = s[i] - 'a';
+      if (i % 2 == 0) {
+        loop(j, 26) {
+          if (i == 0) {
+            pre1[i][j] = (iki == j);
+            continue;
+          }
+          pre1[i][j] = pre1[i - 1][j] + (iki == j);
+          pre2[i][j] = pre2[i - 1][j];
+        }
+      }
+      else {
+        loop(j, 26) {
+          pre1[i][j] = pre1[i - 1][j];
+          pre2[i][j] = pre2[i - 1][j] + (iki == j);
+        }
+      }
     }
 
 
+    for (int i = n - 1; i >= 0; i--) {
+      char iki = s[i] - 'a';
+
+      if (i % 2 == 0) {
+        loop(j, 26) {
+          if (i == n - 1) {
+            suf1[i][j] = (iki == j);
+            continue;
+          }
+          suf1[i][j] = suf1[i + 1][j] + (iki == j);
+          suf2[i][j] = suf2[i + 1][j];
+        }
+      }
+      else {
+        loop(j, 26) {
+          if (i == n - 1) {
+            suf2[i][j] = (iki == j);
+            continue;
+          }
+          suf2[i][j] = suf2[i + 1][j] + (iki == j);
+          suf1[i][j] = suf1[i + 1][j];
+        }
+      }
+    }
+
+    int ans = M;
+
+    loop(i, n) {
+      // remove i-th char
+      int mx1 = 0, mx2 = 0;
+      if (i == 0) {
+        loop(j, 26) {
+          mx1 = max(mx1, suf2[i + 1][j]);
+          mx2 = max(mx2, suf1[i + 1][j]);
+        }
+      }
+      else if (i != n - 1) {
+        loop(j, 26) {
+          mx1 = max(mx1, pre1[i - 1][j] + suf2[i + 1][j]);
+          mx2 = max(mx2, pre2[i - 1][j] + suf1[i + 1][j]);
+        }
+      }
+      else {
+        loop(j, 26) {
+          mx1 = max(mx1, pre1[i - 1][j]);
+          mx2 = max(mx2, pre2[i - 1][j]);
+        }
+      }
+      ans = min(ans, n - mx1 - mx2);
+    }
+    cout << ans << endl;
+    return;
   }
 
   // replace
