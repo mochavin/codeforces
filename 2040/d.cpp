@@ -11,22 +11,36 @@ ll N = 2e5 + 5;
 
 void solve()
 {
-  ll l, r, g; cin >> l >> r >> g;
-  ll l2 = (l + (g - 1)) / g, r2 = r / g; // 2, 4
-  ll x = l2 * g, y = r2 * g; // 4, 8
-  // i: selisih
-  for (ll i = r2 - l2; i >= 0; i--) {
-
-    // j: all the pair for sliding window with length i
-    for (ll j = l2; j + i <= r2; j++) {
-      if (__gcd(j, j + i) == 1) {
-        cout << j * g << " " << (j + i) * g << endl;
-        return;
-      }
-    }
+  ll n; cin >> n;
+  vector<vector<ll>> v(n);
+  loop(i, n - 1) {
+    ll x, y; cin >> x >> y;
+    x--, y--;
+    v[x].push_back(y);
+    v[y].push_back(x);
   }
 
-  cout << -1 << " " << -1 << endl;
+  vector<ll> ans(n);
+  ll last = 1;
+  ans[0] = last;
+
+  function <void(int, int)> dfs = [&](ll id, ll p) {
+    for (ll nei : v[id]) {
+      if (nei == p) continue;
+      ans[nei] = last + 1;
+      while (ans[nei] != ans[id] + 1 and
+        (ans[nei] % 2 != ans[id] % 2 or ans[nei] - ans[id] == 2)) {
+        ans[nei]++;
+      }
+      last = ans[nei];
+      dfs(nei, id);
+    }
+    };
+
+  dfs(0, 0);
+
+  for (ll i : ans) cout << i << " ";
+  cout << endl;
 }
 
 int main()
