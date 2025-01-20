@@ -10,44 +10,66 @@ using namespace std;
 ll M = 1e9 + 7;
 ll N = 2e5 + 5;
 
-vector<ll> parent, sizes;
+struct DSU {
+  vector<int> parent, rank;
+  ll sz;
 
-ll find_set(ll v) {
-  if (v == parent[v])
-    return v;
-  return parent[v] = find_set(parent[v]);
-}
-
-void union_sets(ll a, ll b) {
-  a = find_set(a);
-  b = find_set(b);
-  if (a != b) {
-    if (sizes[a] < sizes[b])
-      swap(a, b);
-    parent[b] = a;
-    sizes[a] += sizes[b];
+  DSU(int n) {
+    parent.resize(n);
+    rank.resize(n, 0);
+    sz = n;
+    iota(parent.begin(), parent.end(), 0); // Inisialisasi parent[i] = i
   }
-}
+
+  int find(int x) {
+    return parent[x] == x ? x : parent[x] = find(parent[x]); // Path compression
+  }
+
+  bool unite(int u, int v) {
+    int rootU = find(u), rootV = find(v);
+    if (rootU == rootV) return false; // Sudah dalam satu set
+    sz--;
+    if (rank[rootU] > rank[rootV]) {
+      parent[rootV] = rootU;
+    }
+    else if (rank[rootU] < rank[rootV]) {
+      parent[rootU] = rootV;
+    }
+    else {
+      parent[rootV] = rootU;
+      rank[rootU]++;
+    }
+    return true;
+  }
+};
 
 void solve()
 {
   ll n, m1, m2; cin >> n >> m1 >> m2;
-
-  // Initialize DSU
-  parent.resize(n + 1);
-  sizes.resize(n + 1, 1);
-  for (int i = 1; i <= n; i++) {
-    parent[i] = i;
-  }
-
+  DSU dsu1(n), dsu2(n);
+  vector<pair<ll, ll>> edge1;
   loop(i, m1) {
-    // edge graph 1
     ll x, y; cin >> x >> y;
+    x--, y--;
+    edge1.push_back({ x, y });
   }
-
   loop(i, m2) {
     ll x, y; cin >> x >> y;
+    x--, y--;
+    dsu2.unite(x, y);
   }
+
+  ll ans = 0;
+  for (auto [x, y] : edge1) {
+    if (dsu2.find(x) != dsu2.find(y)) {
+      ans++;
+    }
+    else {
+      dsu1.unite(x, y);
+    }
+  }
+
+  cout << ans + (dsu1.sz - dsu2.sz) << endl;
 }
 
 int main()
