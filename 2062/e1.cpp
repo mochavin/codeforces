@@ -1,105 +1,87 @@
-#include <bits/stdc++.h>
-#include <iostream>
-#define ll long long
-#define endl '\n'
-#define pb push_back
-#define all(v) v.begin(), v.end()
-#define rall(v) v.rbegin(), v.rend()
-#define loop(i, h) for (int i = 0; i < h; i++)
-#define loop1(i, h) for (int i = 1; i <= h; i++)
+#include "bits/stdc++.h"
 using namespace std;
-ll M = 998244353;
-ll N = 2e5 + 1;
 
-void solve()
-{
-  // find any node that it is the second largest in 
-  // the tree(without counting subtree that not through root (1))
-  ll n; cin >> n;
-  vector<pair<ll, ll>> w(n);
-  vector<vector<ll>> v(n);
-  vector<ll> depth(n), par(n);
-  loop(i, n) {
-    cin >> w[i].first;
-    w[i].second = i;
+const int MAX_NODES = 1e6 + 5;
+vector<int> adjacencyList[MAX_NODES];
+int weights[MAX_NODES];
+int entryTime[MAX_NODES];   // DFS entry time for each node
+int nodeAtEntryTime[MAX_NODES]; // Maps entry time back to node
+int exitTime[MAX_NODES];    // DFS exit time (end of subtree)
+int prefixMax[MAX_NODES];   // Max weight in prefix up to entryTime[i]
+int suffixMax[MAX_NODES];   // Max weight in suffix from entryTime[i]
+bool visited[MAX_NODES];    // To track visited nodes during DFS
+int currentTime;            // Global timer for DFS
+
+// Perform DFS to compute entry and exit times for each node
+void dfs(int currentNode) {
+  if (visited[currentNode]) return;
+  visited[currentNode] = true;
+  entryTime[currentNode] = ++currentTime;
+  nodeAtEntryTime[currentTime] = currentNode;
+  for (int neighbor : adjacencyList[currentNode]) {
+    dfs(neighbor);
   }
-  loop(i, n - 1) {
-    ll x, y; cin >> x >> y;
-    x--, y--;
-    v[x].push_back(y);
-    v[y].push_back(x);
-  }
-
-  vector<pair<ll, ll>> cl = w;
-
-  queue<pair<int, int>> q;
-  q.push({ 0, 0 });
-  vector<bool> vis(n);
-  vis[0] = true;
-  while (!q.empty()) {
-    auto [node, d] = q.front();
-    q.pop();
-    depth[node] = d;
-    for (auto child : v[node]) {
-      if (!vis[child]) {
-        vis[child] = true;
-        q.push({ child, d + 1 });
-        par[child] = node;
-      }
-    }
-  }
-
-  sort(rall(w));
-  // if all same
-  if (w[0].first == w[n - 1].first) {
-    cout << 0 << endl; return;
-  }
-
-  ll cnt = 0;
-  for (int i = 0; i < n; i++) {
-    if (w[i].first == w[0].first) {
-      cnt++;
-      continue;
-    }
-    // cek all the child of this node
-    ll cntEqualTow0 = 0;
-    queue<int> bfs;
-    bfs.push(w[i].second);
-    vector<bool> visi(n, false);
-    visi[w[i].second] = true;
-    while (!bfs.empty()) {
-      int curr = bfs.front();
-      bfs.pop();
-      for (auto child : v[curr]) {
-        if (!visi[child] && child != par[curr]) {
-          // cout << child << " ";
-          visi[child] = true;
-          bfs.push(child);
-          if (w[curr].first >= cl[child].first) {
-            cntEqualTow0++;
-          }
-        }
-      }
-    }
-    cout << cntEqualTow0 << " ";
-    if (cntEqualTow0 <= cnt - 1) {
-      cout << w[i].second + 1 << endl;
-      return;
-    }
-  }
-
-  cout << 0 << endl;
-
+  visited[currentNode] = false; // Reset for other traversals (unconventional but works for trees)
+  exitTime[currentNode] = currentTime;
 }
 
-int main()
-{
-  ios_base::sync_with_stdio(false);
-  cin.tie(NULL);
-  cout.tie(0);
-  ll t; cin >> t;
-  while (t--)
-    solve();
+int main() {
+  ios::sync_with_stdio(0);
+  cin.tie(0);
+  cout << fixed << setprecision(15);
 
-  return 0;
+  int testCases;
+  cin >> testCases;
+
+  while (testCases--) {
+    int numberOfNodes;
+    cin >> numberOfNodes;
+
+    // Reset adjacency lists and reset currentTime (with a redundant loop, kept as original)
+    for (int i = 1; i <= numberOfNodes; ++i) {
+      adjacencyList[i].clear();
+      currentTime = 0; // Incorrect placement, but kept as per original code
+    }
+
+    // Read node weights
+    for (int i = 1; i <= numberOfNodes; ++i) {
+      cin >> weights[i];
+    }
+
+    // Read and build the tree
+    for (int i = 1; i < numberOfNodes; ++i) {
+      int u, v;
+      cin >> u >> v;
+      adjacencyList[u].push_back(v);
+      adjacencyList[v].push_back(u);
+    }
+
+    // Compute entry and exit times via DFS from root (node 1)
+    currentTime = 0; // Correctly reset currentTime here would be better
+    dfs(1);
+
+    // Compute prefix maximums based on DFS entry order
+    prefixMax[0] = 0;
+    for (int i = 1; i <= numberOfNodes; ++i) {
+      prefixMax[i] = max(prefixMax[i - 1], weights[nodeAtEntryTime[i]]);
+    }
+
+    // Compute suffix maximums in reverse DFS entry order
+    suffixMax[numberOfNodes + 1] = 0;
+    for (int i = numberOfNodes; i >= 1; --i) {
+      suffixMax[i] = max(suffixMax[i + 1], weights[nodeAtEntryTime[i]]);
+    }
+
+    // Find the node with maximum weight that has a larger weight outside its subtree
+    int maxValidNode = 0; // 0 indicates no valid node
+    for (int i = 1; i <= numberOfNodes; ++i) {
+      // Check max in prefix (before entryTime) and suffix (after exitTime)
+      int maxOutside = max(prefixMax[entryTime[i] - 1], suffixMax[exitTime[i] + 1]);
+      if (maxOutside > weights[i] && weights[i] > weights[maxValidNode]) {
+        maxValidNode = i;
+      }
+    }
+
+    cout << maxValidNode << '\n';
+  }
 }
