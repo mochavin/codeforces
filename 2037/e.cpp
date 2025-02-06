@@ -40,43 +40,46 @@ void solve()
   ll n;
   cin >> n;
 
-  vector<ll> f(n + 1);
-  for (ll i = 1; i <= n; i++) {
-    f[i] = q(i, n);
-  }
+  vector<ll> f(n + 1, 0);
+  string s(n, '0');
 
-  string s(n, '?');
-  ll ones = 0;
+  ll cek = 0;
 
-  for (ll i = 1; i < n; i++) {
-    if (f[i] == f[i + 1]) {
-      s[i - 1] = '1';
-      ones++;
+  for (ll i = 2; i <= n; i++) {
+    f[i] = q(1, i);
+    if (f[i] != 0) {
+      cek = i;
+      if (i == 1) {
+        cout << "! IMPOSSIBLE" << endl;
+        fflush(stdout);
+        return;
+      }
+      break;
     }
-    else {
-      s[i - 1] = '0';
-    }
   }
 
-  if (f[n] == 0) {
-    if (ones == 0) s[n - 1] = '1';
-    else s[n - 1] = '0';
-  }
-  else {
+  // 11111111
+  // 00000000
+  if (!cek) {
     cout << "! IMPOSSIBLE" << endl;
+    fflush(stdout);
     return;
   }
 
-  for (char c : s) {
-    if (c == '?') {
-      cout << "! IMPOSSIBLE" << endl;
-      return;
+  loop(i, cek - f[cek] - 1) {
+    s[i] = '1';
+  }
+
+  s[cek - 1] = '1';
+
+  for (int i = cek + 1; i <= n; i++) {
+    f[i] = q(1, i);
+    if (f[i] > f[i - 1]) {
+      s[i - 1] = '1';
     }
   }
 
-  cout << "! " << s << endl;
-
-
+  cout << "! " << s << endl; fflush(stdout);
 }
 
 int main()
