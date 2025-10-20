@@ -11,19 +11,8 @@ ll N = 2e5 + 10;
 
 void solve()
 {
-  ll n; cin >> n;
-  vector<ll> v(n), c(n + 1, 0);
-  loop(i, n) {
-    cin >> v[i];
-    c[v[i]]++;
-  }
-  sort(rall(c));
-  ll ans = 0;
-  loop(i, n + 1) {
-    if (c[i] == 0) break;
-    ans = max(ans, c[i] * (i + 1));
-  }
-  cout << ans << endl;
+  loop(i, 100)
+    cout << i << " " << 62 - __countl_zero(i) << endl;
 }
 
 int main()

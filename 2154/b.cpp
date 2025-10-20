@@ -12,16 +12,23 @@ ll N = 2e5 + 10;
 void solve()
 {
   ll n; cin >> n;
-  vector<ll> v(n), c(n + 1, 0);
+  vector<ll> v(n), pre(n, 0);
   loop(i, n) {
     cin >> v[i];
-    c[v[i]]++;
   }
-  sort(rall(c));
-  ll ans = 0;
-  loop(i, n + 1) {
-    if (c[i] == 0) break;
-    ans = max(ans, c[i] * (i + 1));
+  loop(i, n) {
+    if (i) pre[i] = max(pre[i - 1], v[i]);
+    else pre[i] = v[i];
+    if (i % 2) v[i] = max(pre[i], v[i]);
+  }
+  ll ans = max(0ll, v[0] - v[1] + 1);
+  loop(i, n) {
+    if (i == 0) continue;
+    if (i % 2 == 0) {
+      if (v[i] >= pre[i - 1]) {
+        ans += v[i] - pre[i - 1] + 1;
+      }
+    }
   }
   cout << ans << endl;
 }

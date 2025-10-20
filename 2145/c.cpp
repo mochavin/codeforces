@@ -11,19 +11,27 @@ ll N = 2e5 + 10;
 
 void solve()
 {
-  ll n; cin >> n;
-  vector<ll> v(n), c(n + 1, 0);
-  loop(i, n) {
-    cin >> v[i];
-    c[v[i]]++;
+  ll n; cin >> n; string s; cin >> s;
+  vector<ll> pre(n + 1, 0);
+  loop1(i, n) {
+    pre[i] = pre[i - 1] + (s[i - 1] == 'a' ? 1 : -1);
   }
-  sort(rall(c));
-  ll ans = 0;
-  loop(i, n + 1) {
-    if (c[i] == 0) break;
-    ans = max(ans, c[i] * (i + 1));
+
+  // shortest substring sum = pre[n];
+  map<ll, ll> mp;
+  mp[0] = 0;
+  ll ans = M;
+  loop1(i, n) {
+    mp[pre[i]] = i;
+    ll cek = pre[i] - pre[n];
+    if (mp.count(cek)) {
+      // cout << i << " ";
+      ans = min(i - mp[cek], ans);
+    }
   }
-  cout << ans << endl;
+  if (ans == n) cout << -1 << endl;
+  else
+    cout << ans << endl;
 }
 
 int main()

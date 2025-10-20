@@ -11,19 +11,23 @@ ll N = 2e5 + 10;
 
 void solve()
 {
-  ll n; cin >> n;
-  vector<ll> v(n), c(n + 1, 0);
+  ll n, k; cin >> n >> k;
+  vector<ll> v(n);
+  map<ll, ll> mp;
   loop(i, n) {
     cin >> v[i];
-    c[v[i]]++;
+    mp[v[i]]++;
   }
-  sort(rall(c));
-  ll ans = 0;
-  loop(i, n + 1) {
-    if (c[i] == 0) break;
-    ans = max(ans, c[i] * (i + 1));
+  ll c = 0;
+  for (int i = k - 1; i >= 0; i--) {
+    if (mp[i] == 0) c++;
   }
-  cout << ans << endl;
+  if (mp[k] >= c) {
+    cout << mp[k] << endl;
+  }
+  else {
+    cout << c << endl;
+  }
 }
 
 int main()

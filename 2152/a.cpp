@@ -11,19 +11,14 @@ ll N = 2e5 + 10;
 
 void solve()
 {
-  ll n; cin >> n;
-  vector<ll> v(n), c(n + 1, 0);
+  int n; cin >> n;
+  vector<ll> v(n);
+  set<ll> st;
   loop(i, n) {
-    cin >> v[i];
-    c[v[i]]++;
+    cin >> v[i]; st.insert(v[i]);
   }
-  sort(rall(c));
-  ll ans = 0;
-  loop(i, n + 1) {
-    if (c[i] == 0) break;
-    ans = max(ans, c[i] * (i + 1));
-  }
-  cout << ans << endl;
+  cout << st.size() * 2 - 1;
+  cout << endl;
 }
 
 int main()

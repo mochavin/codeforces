@@ -11,17 +11,28 @@ ll N = 2e5 + 10;
 
 void solve()
 {
-  ll n; cin >> n;
-  vector<ll> v(n), c(n + 1, 0);
+  ll n, k, l, r; cin >> n >> k >> l >> r;
+  vector<ll> v(n);
   loop(i, n) {
     cin >> v[i];
-    c[v[i]]++;
   }
-  sort(rall(c));
-  ll ans = 0;
-  loop(i, n + 1) {
-    if (c[i] == 0) break;
-    ans = max(ans, c[i] * (i + 1));
+
+  ll ans = 0, x = 0, y = 0;
+  map<ll, ll> st, st2;
+  loop(i, n) {
+    while (x <= n and st.size() < k) {
+      if (x < n) st[v[x]]++;
+      x++;
+    }
+    while (y <= n and st2.size() <= k) {
+      if (y < n) st2[v[y]]++;
+      y++;
+    }
+
+    ans += max(0ll, min(y - 2, i + r - 1) - (max(x - 1, i + l - 1) - 1));
+
+    if (--st[v[i]] == 0) st.erase(v[i]);
+    if (--st2[v[i]] == 0) st2.erase(v[i]);
   }
   cout << ans << endl;
 }

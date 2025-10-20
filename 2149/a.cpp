@@ -12,18 +12,21 @@ ll N = 2e5 + 10;
 void solve()
 {
   ll n; cin >> n;
-  vector<ll> v(n), c(n + 1, 0);
+  vector<ll> v(n);
+  ll gnv = LONG_LONG_MIN, lpv = LONG_LONG_MAX;
+  ll c = 0, c0 = 0;
   loop(i, n) {
     cin >> v[i];
-    c[v[i]]++;
+    if (v[i] < 0) c++, gnv = max(v[i], gnv);
+    else if (v[i] == 0) c0++;
+    else lpv = min(lpv, v[i]);
   }
-  sort(rall(c));
-  ll ans = 0;
-  loop(i, n + 1) {
-    if (c[i] == 0) break;
-    ans = max(ans, c[i] * (i + 1));
+  if (c % 2 == 0) {
+    cout << c0 << endl; return;
   }
-  cout << ans << endl;
+  else {
+    cout << c0 + min(lpv, -gnv) + 1 << endl;
+  }
 }
 
 int main()

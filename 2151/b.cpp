@@ -11,19 +11,37 @@ ll N = 2e5 + 10;
 
 void solve()
 {
-  ll n; cin >> n;
-  vector<ll> v(n), c(n + 1, 0);
+  ll n, m; cin >> n >> m;
+  string s; cin >> s;
+  vector<ll> a(m);
+  map<ll, bool> mp;
+  loop(i, m) {
+    cin >> a[i];
+    mp[a[i]] = 1;
+  }
+  ll cur = 1;
   loop(i, n) {
-    cin >> v[i];
-    c[v[i]]++;
+    if (s[i] == 'A') {
+      cur++;
+      mp[cur] = 1;
+    }
+    else {
+      cur++;
+      while (mp.count(cur)) {
+        cur++;
+      }
+      mp[cur] = 1;
+      while (mp.count(cur)) {
+        cur++;
+      }
+    }
   }
-  sort(rall(c));
-  ll ans = 0;
-  loop(i, n + 1) {
-    if (c[i] == 0) break;
-    ans = max(ans, c[i] * (i + 1));
+  cout << mp.size() << endl;
+  for (auto x : mp) {
+    cout << x.first << " ";
   }
-  cout << ans << endl;
+  cout << endl;
+
 }
 
 int main()

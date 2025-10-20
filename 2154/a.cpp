@@ -11,23 +11,31 @@ ll N = 2e5 + 10;
 
 void solve()
 {
-  ll n; cin >> n;
-  vector<ll> v(n), c(n + 1, 0);
+  ll n, k; cin >> n >> k;
+  string s; cin >> s;
+  ll ans = 0, c = 0, f = 0;
   loop(i, n) {
-    cin >> v[i];
-    c[v[i]]++;
-  }
-  sort(rall(c));
-  ll ans = 0;
-  loop(i, n + 1) {
-    if (c[i] == 0) break;
-    ans = max(ans, c[i] * (i + 1));
+    if (s[i] == '0') c++;
+    else {
+      if (!f) {
+        ans++;
+      }
+      else {
+        if (c >= k - 1) ans++;
+      }
+      f = 1;
+      c = 0;
+    }
   }
   cout << ans << endl;
 }
 
 int main()
 {
+  #ifndef ONLINE_JUDGE
+        freopen("input.txt", "r", stdin);
+        freopen("output.txt", "w", stdout);
+  #endif
   ios_base::sync_with_stdio(false);
   cin.tie(NULL);
   cout.tie(0);
