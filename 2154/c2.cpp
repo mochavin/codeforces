@@ -9,51 +9,61 @@ using namespace std;
 ll M = 998244353;
 ll N = 2e5 + 10;
 
+vector<vector<ll>> fac(N);
+vector<ll> cnt(N);
+
 void solve()
 {
   ll n; cin >> n;
   vector<ll> a(n), b(n);
-  map<ll, ll> mp, mp2;
+  vector<pair<ll, ll>> pr(n);
+  loop(i, n) cin >> a[i];
   loop(i, n) {
-    cin >> a[i];
+    cin >> b[i]; pr[i] = { a[i], b[i] };
   }
+  sort(all(pr), [&](pair<ll, ll> x, pair<ll, ll> y) {
+    return x.second < y.second;
+    });
+
+  fill(all(cnt), 0);
+
   loop(i, n) {
-    cin >> b[i];
-    if (mp2.count(a[i])) mp2[a[i]] = min(b[i], mp2[a[i]]);
-    else mp2[a[i]] = b[i];
-  }
-  loop(i, n) {
-    for (int j = 1; j * j <= a[i]; j++) {
-      if (j * j == a[i]) mp[j]++;
-      else if (a[i] % j == 0) mp[j]++, mp[a[i] / j]++;
-      if (j > 1 and (mp.count(j) and mp.count(a[i] / j) and (mp[j] > 1 or mp[a[i] / j] > 1))) {
+    for (auto x : fac[a[i]]) {
+      cnt[x]++;
+      if (cnt[x] > 1) {
         cout << 0 << endl; return;
       }
     }
   }
 
-  ll mn = M;
-  for (auto [fs, se] : mp) {
-    // cout << fs << ": ";
-    loop(i, n) {
-      if (fs > 1 and (a[i] + 1) % fs == 0 and a[i] > 1) {
-        // cout << i << " ";
-        mn = min(mn, b[i]);
+  ll ans = pr[0].second + pr[1].second;
+
+  loop(i, n) {
+    for (auto x : fac[pr[i].first]) {
+      cnt[x]--;
+    }
+    for (auto x : fac[pr[i].first + 1]) {
+      if (cnt[x]) {
+        ans = min(ans, pr[i].second);
       }
     }
-    // cout << endl;
-  }
-  sort(all(b));
-  sort(all(a));
-  if (mn == M) cout << b[0] + b[1] << endl;
-  else {
-    ll temp = (a[1] - a[0]) * mp2[a[0]];
-    loop(i, n - 1) {
-      temp = min(temp, (a[i + 1] - a[i]) * mp2[a[i]]);
+    for (auto x : fac[pr[i].first]) {
+      cnt[x]++;
     }
-    cout << min(temp, min(mn, b[0] + b[1])) << endl;
   }
 
+  set<ll> allFac;
+  loop1(i, n - 1) {
+    for (auto x : fac[pr[i].first]) {
+      allFac.insert(x);
+    }
+  }
+
+  for (auto x : allFac) {
+    ll t = x - (pr[0].first % x);
+    ans = min(ans, t * pr[0].second);
+  }
+  cout << ans << endl;
 }
 
 int main()
@@ -61,6 +71,14 @@ int main()
   ios_base::sync_with_stdio(false);
   cin.tie(NULL);
   cout.tie(0);
+
+  for (ll i = 2; i < N; i++) {
+    if (fac[i].size()) continue;
+    for (ll j = i; j < N; j += i) {
+      fac[j].push_back(i);
+    }
+  }
+
   ll t; cin >> t;
   while (t--)
     solve();

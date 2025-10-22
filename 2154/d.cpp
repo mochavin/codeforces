@@ -12,38 +12,59 @@ ll N = 2e5 + 10;
 void solve()
 {
   ll n; cin >> n;
-  vector<set<ll>> v(n);
-  loop(i, n) {
+  vector<vector<ll>> v(n);
+  loop(i, n - 1) {
     ll x, y; cin >> x >> y;
     x--, y--;
-    v[x].insert(y);
-    v[y].insert(x);
+    v[x].push_back(y);
+    v[y].push_back(x);
   }
 
-  vector<ll> d(n, M), vis(n, 0);
-  map<ll, vector<ll>> mp;
-  d[0] = 0;
-  function<void(ll, ll)> dfs = [&](ll x, ll dd) {
-    vis[x] = 1;
-    for (auto adj : v[x]) {
-      if (vis[adj]) continue;
-      d[adj] = dd + 1;
-      mp[dd + 1].push_back(adj);
-      dfs(adj, dd + 1);
+  vector<ll> par(n, 0), ch(n, 0), dep(n, 0);
+  auto dfs = [&](auto self, ll c, ll p) -> void {
+    if (p != -1) dep[c] = dep[p] + 1;
+    par[c] = p;
+    for (auto x : v[c]) {
+      if (x == p) continue;
+
+      self(self, x, c);
+      ch[c]++;
     }
-    return;
     };
 
-  dfs(0, 0);
-  ll cur = 0;
-  vector<ll> ans;
-  for (int j = d[n - 1] + 1; j < n; j++) {
-    for (auto x : mp[j]) {
-      ans.push_back(x);
+  dfs(dfs, n - 1, -1);
+
+  vector<vector<ll>> leaf(2);
+  loop(i, n) {
+    if (ch[i] == 0) {
+      leaf[dep[i] % 2].push_back(i);
     }
   }
-  for (int j = 0; j < d[n - 1]; j++) {
 
+  vector<pair<ll, ll>> ans;
+  ll cur = dep[0] & 1;
+  loop(i, n - 1) {
+    if (leaf[cur ^ 1].empty()) {
+      ans.push_back({ 1, 1 });
+      cur ^= 1;
+    }
+
+    ll nx = leaf[cur ^ 1].back();
+    ans.push_back({ 2, nx });
+    leaf[cur ^ 1].pop_back();
+
+    ll p = par[nx];
+    if (--ch[p] == 0) {
+      leaf[dep[p] & 1].push_back(p);
+    }
+
+    ans.push_back({ 1,1 });
+    cur ^= 1;
+  }
+  cout << ans.size() << endl;
+  for (auto x : ans) {
+    if (x.first == 1) cout << 1 << endl;
+    else cout << "2 " << x.second + 1 << endl;
   }
 }
 
