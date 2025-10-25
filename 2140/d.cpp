@@ -6,7 +6,7 @@
 #define loop(i, h) for (int i = 0; i < h; i++)
 #define loop1(i, h) for (int i = 1; i <= h; i++)
 using namespace std;
-ll M = 998244353;
+ll M = 1e18;
 ll N = 2e5 + 10;
 
 void solve()
@@ -14,32 +14,39 @@ void solve()
   ll n; cin >> n;
   vector<pair<ll, ll>> v(n);
   vector<ll> b(n);
-  ll ans = 0, mx = -M;
+  ll ans = 0, mn = M;
   loop(i, n) {
     ll x, y; cin >> x >> y;
     v[i] = { x, y };
     ans += y - x;
     ans += y;
-    mx = max(y - x, mx);
+    mn = min(y, mn);
   }
-  loop(i, n) v[i].first += v[i].second;
-  sort(all(v));
-  ll it = 0;
-  vector<ll> vis(n + 1, 0);
-  loop(i, (n) / 2) {
-    ans -= v[i].first;
-    vis[i] = 1;
-    it++;
+
+  sort(all(v), [&](pair<ll, ll> a, pair<ll, ll> b) {
+    return a.first + a.second < b.first + b.second;
+    });
+  // for (auto [x, y] : v) {
+  //   cout << x << " " << y << endl;
+  // }
+  loop(i, n / 2) {
+    ans -= (v[i].first + v[i].second);
   }
-  if (n % 2) {
-    ll mx = LLONG_MIN;
-    loop(i, n) {
-      if (vis[i]) mx = max(mx, v[i].first);
+  // if(n % 2) ans -= (v[(n+1)/2].first + v[(n+1)/2].second);
+  if (n & 1) {
+    ll mn = M, t = ans;
+    for (int i = n / 2; i < n; i++) {
+      mn = min(mn, v[i].second);
     }
-    ans += mx;
+    t -= mn;
+    ll t2 = ans - (v[n / 2].first + v[n / 2].second);
+    ll mx = -M;
+    for (int i = 0; i < n / 2; i++) {
+      mx = max(mx, v[i].first);
+    }
+    t2 += mx;
+    ans = max(t, t2);
   }
-
-
   cout << ans << endl;
 }
 
