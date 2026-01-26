@@ -21,35 +21,37 @@ void solve()
   sort(a.begin(), a.end());
   sort(b.begin(), b.end());
 
-  map<int, vector<int>> prl;
-  map<int, vector<int>> prr;
-  set<int> st;
-  for (int i = 0; i < n; i++) st.insert(i);
-  int c = 1;
-  for (int i = 0; i < n; i++) {
-    while (b[c] < a[i]) c++;
-    prl[a[i] - b[c - 1]].push_back(i);
-    prr[b[c] - a[i]].push_back(i);
-  }
-
   string s; cin >> s;
-  c = 0;
+  map<int, vector<int>> d;
+  vector<int> dead(n, 0);
+  int ans = n;
+
+  for (int i = 0, j = 0; i < n; i++) {
+    while (b[j] < a[i]) j++;
+    d[-(a[i] - b[j - 1])].push_back(i);
+    d[(b[j] - a[i])].push_back(i);
+  }
+  int c = 0, r = 0, l = 0;
   for (int i = 0; i < k; i++) {
     if (s[i] == 'L') c--;
     else c++;
 
-    if (c < 0) {
-      for (auto x : prl[-c]) {
-        st.erase(x);
-        // cout << x << " ";
+    if (c < l) {
+      l = c;
+      for (auto x : d[c]) {
+        if (!dead[x]) ans--;
+        dead[x] = 1;
       }
     }
-    else {
-      for (auto x : prr[c]) {
-        st.erase(x);
+    if (c > r) {
+      r = c;
+      for (auto x : d[c]) {
+        if (!dead[x]) ans--;
+        dead[x] = 1;
       }
     }
-    cout << st.size() << " ";
+
+    cout << ans << " ";
   }
   cout << endl;
 }
