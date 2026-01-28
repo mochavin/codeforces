@@ -11,16 +11,23 @@ ll N = 2e5 + 10;
 
 void solve()
 {
-  int n, a; cin >> n >> a;
+  int n; cin >> n;
   vector<int> v(n);
-  int x = a - 1, y = a + 1;
-  int res1 = 0, res2 = 0;
+  for (int i = 0; i < n; i++) cin >> v[i];
+  vector<ll> pre(n + 1, 0), s(n + 1, 0);
   for (int i = 0; i < n; i++) {
-    cin >> v[i];
-    if (abs(v[i] - a) > abs(v[i] - x)) res1++;
-    if (abs(v[i] - a) > abs(v[i] - y)) res2++;
+    pre[i + 1] = v[i];
+    pre[i + 1] += pre[i];
+    ll c = i + 1;
+    s[i + 1] = c * c + c - pre[i + 1];
   }
-  cout << (res1 > res2 ? x : y) << endl;
+  ll mn = s[0], ans = 0;
+  for (int i = 0; i <= n; i++) {
+    ans = max(ans, s[i] - mn);
+    // cout << s[i] << " ";
+    mn = min(mn, s[i]);
+  }
+  cout << pre[n] + ans << endl;
 }
 
 int main()
