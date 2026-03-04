@@ -11,34 +11,22 @@ ll N = 2e5 + 10;
 
 void solve()
 {
-  int n; cin >> n;
-  vector<ll> a(n), b(n);
+  ll n; cin >> n;
+  vector<ll> a(n), b(n + 1, 0);
   for (int i = 0; i < n; i++) cin >> a[i];
-  for (int i = 0; i < n; i++) cin >> b[i];
-  sort(a.begin(), a.end());
-  vector<ll> pre(n + 1, 0);
-  for (int i = 1; i <= n; i++) {
-    pre[i] = pre[i - 1] + b[i - 1];
-  }
+  for (int i = 1; i <= n; i++) cin >> b[i];
+
+  int lv = 0, sum = 0;
   ll ans = 0;
-  for (int i = 0; i < n; i++) {
-    ll l = 0, r = n, nn = n;
-    ll xx = a[i];
-    ll lb = lower_bound(a.begin(), a.end(), xx) - a.begin();
-    // cout << lb << " ";
-    while (l <= r) {
-      ll m = l + (r - l) / 2;
-      // cout << m << " ";
-      if (pre[m] <= n - lb) {
-        nn = m;
-        l = m + 1;
-      }
-      else {
-        r = m - 1;
-      }
+  sort(a.rbegin(), a.rend());
+
+  for (int i = 1; i <= n; i++) {
+    while (lv < n and sum + b[lv + 1] <= i) {
+      sum += b[lv + 1];
+      lv++;
     }
-    ans = max(ans, a[i] * nn);
-    // cout << endl;
+
+    ans = max(ans, lv * a[i - 1]); // lv * x
   }
   cout << ans << endl;
 }

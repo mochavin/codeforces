@@ -8,51 +8,27 @@
 using namespace std;
 ll M = 998244353;
 ll N = 2e5 + 10;
-set<ll> st;
-vector<ll> pre(3e5 + 1, 0);
-
-ll rec(ll n) {
-  if (st.count(n)) return 1;
-  if (pre[n]) return pre[n];
-  ll mn = M, sq = sqrt(n);
-  for (int i = 2; i <= sq; i++) {
-    if (n % i == 0) mn = min(mn, rec(n / i) + rec(i));
-  }
-  pre[n] = mn;
-  return mn;
-}
+vector<int> dp(3e5 + 1);
 
 void solve()
 {
-  pre.clear();
-  pre.resize(3e5 + 1);
-  st.clear();
-  ll n; cin >> n;
+  int n; cin >> n;
+  for (int i = 1; i <= n; i++) dp[i] = M;
   for (int i = 0; i < n; i++) {
-    ll in; cin >> in; st.insert(in);
+    int in; cin >> in; dp[in] = 1;
   }
-  if (n == 1) {
-    if (st.contains(1)) cout << 1 << endl;
-    else cout << -1 << endl;
-    return;
-  }
-  if (n == 2) {
-    if (st.contains(1)) cout << 1 << " ";
-    else cout << -1 << " ";
-    if (st.contains(2)) cout << 1 << endl;
-    else cout << -1 << endl;
-    return;
-  }
-  if (st.contains(1)) cout << 1 << " ";
-  else cout << -1 << " ";
-  if (st.contains(2)) cout << 1 << " ";
-  else cout << -1 << " ";
 
-  for (int i = 3; i <= n; i++) {
-    ll temp = rec(i);
-    cout << (temp == M ? -1 : temp) << " ";
+  for (int i = 1; i <= n; i++) {
+    for (int j = i; j <= n; j += i) {
+      dp[j] = min(dp[j], dp[i] + dp[j / i]);
+    }
+  }
+
+  for (int i = 1; i <= n; i++) {
+    cout << (dp[i] == M ? -1 : dp[i]) << " ";
   }
   cout << endl;
+
 }
 
 int main()

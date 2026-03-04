@@ -13,24 +13,33 @@ void solve()
 {
   int n; cin >> n;
   vector<int> v(n);
-  for (int i = 0; i < n; i++) {
-    cin >> v[i];
-  }
-  int it = 0, val = n;
-  for (int i = 0; i < n; i++) {
-    if (v[i] != n - i) {
-      val = n - i;
-      it = i; break;
-    }
-  }
-  for (int i = it; i < n; i++) {
-    if (v[i] == val) {
-      reverse(v.begin() + it, v.begin() + i + 1);
-      break;
-    }
-  }
-  for (auto x : v) cout << x << " ";
+  for (int i = 0; i < n; i++) cin >> v[i];
 
+  int ls = -1;
+  for (int i = 0; i < n; i++) {
+    if (v[i] == n - i) {
+      cout << v[i] << " ";
+      ls = i;
+      continue;
+    }
+    break;
+  }
+  int x = n;
+  if (ls == -1) ls = -1;
+  else x = v[ls] - 1;
+
+  if (x == 0) {
+    cout << endl; return;
+  }
+
+  int id = -1;
+  for (int i = ls + 1; i < n; i++) {
+    if (v[i] == x) {
+      id = i; break;
+    }
+  }
+  reverse(v.begin() + ls + 1, v.begin() + id + 1);
+  for (int i = ls + 1; i < n; i++) cout << v[i] << " ";
   cout << endl;
 
 }
